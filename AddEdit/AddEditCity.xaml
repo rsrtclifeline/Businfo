@@ -1,0 +1,312 @@
+﻿<Window
+    x:Class="Businfo.AddEdit.AddEditCity"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Title="Add / Edit City"
+    Width="900"
+    Height="720"
+    Background="#F8FAFC"
+    ResizeMode="CanResize"
+    SnapsToDevicePixels="True"
+    UseLayoutRounding="True"
+    WindowStartupLocation="CenterScreen"
+    mc:Ignorable="d">
+
+    <Window.Resources>
+        <!--  Form Field Label  -->
+        <Style x:Key="FieldLabel" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="#475569" />
+            <Setter Property="Margin" Value="0,0,0,6" />
+        </Style>
+
+        <!--  Secondary Neutral Button  -->
+        <Style x:Key="ModalSecondaryButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#F1F5F9" />
+            <Setter Property="Foreground" Value="#475569" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Height" Value="36" />
+            <Setter Property="Padding" Value="18,0" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="BorderBrush" Value="#CBD5E1" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border
+                            x:Name="border"
+                            Padding="{TemplateBinding Padding}"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="8">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#E2E8F0" />
+                                <Setter Property="Foreground" Value="#0F172A" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#CBD5E1" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!--  Primary Blue Button  -->
+        <Style x:Key="ModalPrimaryButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#2563EB" />
+            <Setter Property="Foreground" Value="#FFFFFF" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Height" Value="36" />
+            <Setter Property="Padding" Value="22,0" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border
+                            x:Name="border"
+                            Padding="{TemplateBinding Padding}"
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="8">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#1D4ED8" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#1E40AF" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!--  Top Header & Actions  -->
+        <DockPanel
+            Grid.Row="0"
+            Margin="0,0,0,16"
+            LastChildFill="False">
+            <StackPanel
+                VerticalAlignment="Center"
+                DockPanel.Dock="Left"
+                Orientation="Vertical">
+                <TextBlock
+                    FontSize="22"
+                    FontWeight="Bold"
+                    Foreground="#0F172A"
+                    Text="Add / Edit City" />
+                <TextBlock
+                    Margin="0,3,0,0"
+                    FontSize="13"
+                    Foreground="#64748B"
+                    Text="Configure regional administrative data and assigned routes" />
+            </StackPanel>
+
+            <!--  Save / Discard Header Actions  -->
+            <StackPanel
+                VerticalAlignment="Center"
+                DockPanel.Dock="Right"
+                Orientation="Horizontal">
+                <Button
+                    Margin="0,0,10,0"
+                    Click="Button_Discard_Click"
+                    Content="Discard"
+                    Style="{StaticResource ModalSecondaryButtonStyle}" />
+                <Button
+                    Click="Button_Click"
+                    Content="Save City"
+                    Style="{StaticResource ModalPrimaryButtonStyle}" />
+            </StackPanel>
+        </DockPanel>
+
+        <!--  Input Form Card (2x2 Grid)  -->
+        <Border
+            Grid.Row="1"
+            Margin="0,0,0,18"
+            Padding="20,16"
+            Background="#FFFFFF"
+            BorderBrush="#E2E8F0"
+            BorderThickness="1"
+            CornerRadius="10">
+            <Border.Effect>
+                <DropShadowEffect
+                    BlurRadius="14"
+                    Direction="270"
+                    Opacity="0.04"
+                    ShadowDepth="2"
+                    Color="#0F172A" />
+            </Border.Effect>
+
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="20" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <!--  State  -->
+                <StackPanel
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    Margin="0,0,0,12">
+                    <TextBlock Style="{StaticResource FieldLabel}" Text="State" />
+                    <TextBox
+                        x:Name="txtState"
+                        Height="36"
+                        Style="{StaticResource ModernSearchBox}" />
+                </StackPanel>
+
+                <!--  District  -->
+                <StackPanel
+                    Grid.Row="0"
+                    Grid.Column="2"
+                    Margin="0,0,0,12">
+                    <TextBlock Style="{StaticResource FieldLabel}" Text="District" />
+                    <TextBox
+                        x:Name="txtDistrict"
+                        Height="36"
+                        Style="{StaticResource ModernSearchBox}" />
+                </StackPanel>
+
+                <!--  City  -->
+                <StackPanel Grid.Row="1" Grid.Column="0">
+                    <TextBlock Style="{StaticResource FieldLabel}" Text="City Name" />
+                    <TextBox
+                        x:Name="txtCity"
+                        Height="36"
+                        Style="{StaticResource ModernSearchBox}" />
+                </StackPanel>
+
+                <!--  City Code  -->
+                <StackPanel Grid.Row="1" Grid.Column="2">
+                    <TextBlock Style="{StaticResource FieldLabel}" Text="City Code" />
+                    <TextBox
+                        x:Name="cityCode"
+                        Height="36"
+                        Style="{StaticResource ModernSearchBox}" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!--  References Header Section  -->
+        <TextBlock
+            Grid.Row="2"
+            Margin="2,0,0,10"
+            FontSize="14"
+            FontWeight="SemiBold"
+            Foreground="#334155"
+            Text="Matched Routes &amp; References" />
+
+        <!--  Matched Buses Grid Card  -->
+        <Border
+            Grid.Row="3"
+            Background="#FFFFFF"
+            BorderBrush="#E2E8F0"
+            BorderThickness="1"
+            CornerRadius="10">
+            <Border.Effect>
+                <DropShadowEffect
+                    BlurRadius="14"
+                    Direction="270"
+                    Opacity="0.04"
+                    ShadowDepth="2"
+                    Color="#0F172A" />
+            </Border.Effect>
+
+            <DataGrid
+                x:Name="matched_grid"
+                AutoGenerateColumns="False"
+                CanUserAddRows="False"
+                CanUserDeleteRows="False"
+                IsReadOnly="True"
+                RowHeaderWidth="0"
+                SelectionMode="Single"
+                SelectionUnit="FullRow"
+                SnapsToDevicePixels="True"
+                Style="{StaticResource ModernDataGridStyle}">
+
+                <DataGrid.Columns>
+                    <DataGridTextColumn
+                        Width="120"
+                        Binding="{Binding Vendor}"
+                        Header="Vendor" />
+
+                    <DataGridTextColumn
+                        Width="110"
+                        Binding="{Binding From}"
+                        Header="From" />
+
+                    <DataGridTextColumn
+                        Width="110"
+                        Binding="{Binding To}"
+                        Header="To" />
+
+                    <DataGridTextColumn
+                        Width="95"
+                        Binding="{Binding Departure}"
+                        Header="Departure" />
+
+                    <DataGridTextColumn
+                        Width="95"
+                        Binding="{Binding Arrival}"
+                        Header="Arrival" />
+
+                    <DataGridTextColumn
+                        Width="120"
+                        Binding="{Binding Depot}"
+                        Header="Depot" />
+
+                    <DataGridTextColumn
+                        Width="*"
+                        Binding="{Binding Route}"
+                        Header="Route" />
+
+                    <DataGridTemplateColumn Width="95" Header="Go To Bus">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                    <Button
+                                        Background="#E0E7FF"
+                                        Click="Button_Click_1"
+                                        Style="{StaticResource ModernGridActionButton}"
+                                        ToolTip="Edit Bus">
+                                        <TextBlock
+                                            FontFamily="Segoe MDL2 Assets"
+                                            FontSize="12"
+                                            Foreground="#3730A3"
+                                            Text="&#xE70F;" />
+                                    </Button>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Border>
+    </Grid>
+</Window>

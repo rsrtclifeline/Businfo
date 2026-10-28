@@ -1,0 +1,147 @@
+﻿<Window
+    x:Class="Businfo.Manage.Manage_Depot"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:Businfo.Manage"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Title="Manage Depot"
+    Width="950"
+    Height="550"
+    Background="#F8FAFC"
+    ResizeMode="CanResize"
+    SnapsToDevicePixels="True"
+    UseLayoutRounding="True"
+    WindowStartupLocation="CenterScreen"
+    WindowState="Maximized"
+    mc:Ignorable="d">
+
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!--  Top Header & Actions  -->
+        <DockPanel
+            Grid.Row="0"
+            Margin="0,0,0,20"
+            LastChildFill="False">
+            <!--  Left Heading  -->
+            <StackPanel
+                VerticalAlignment="Center"
+                DockPanel.Dock="Left"
+                Orientation="Vertical">
+                <TextBlock
+                    FontSize="22"
+                    FontWeight="Bold"
+                    Foreground="#0F172A"
+                    Text="Manage Depot" />
+                <TextBlock
+                    Margin="0,4,0,0"
+                    FontSize="13"
+                    Foreground="#64748B"
+                    Text="Overview and allocation of bus operational depots" />
+            </StackPanel>
+
+            <!--  Right Add Depot Button  -->
+            <Button
+                VerticalAlignment="Center"
+                Click="btnAddDepot_Click"
+                Content="+ Add New Depot"
+                DockPanel.Dock="Right"
+                Style="{StaticResource ModernPrimaryButtonStyle}" />
+        </DockPanel>
+
+        <!--  Main DataGrid Container Card  -->
+        <Border
+            Grid.Row="1"
+            Background="#FFFFFF"
+            BorderBrush="#E2E8F0"
+            BorderThickness="1"
+            CornerRadius="10">
+            <Border.Effect>
+                <DropShadowEffect
+                    BlurRadius="16"
+                    Direction="270"
+                    Opacity="0.04"
+                    ShadowDepth="2"
+                    Color="#0F172A" />
+            </Border.Effect>
+
+            <DataGrid
+                x:Name="dgDepots"
+                AutoGenerateColumns="False"
+                CanUserAddRows="False"
+                CanUserDeleteRows="False"
+                IsReadOnly="True"
+                RowHeaderWidth="0"
+                SelectionMode="Single"
+                SelectionUnit="FullRow"
+                SnapsToDevicePixels="True"
+                Style="{StaticResource ModernDataGridStyle}">
+
+                <DataGrid.Columns>
+                    <DataGridTextColumn
+                        Width="160"
+                        Binding="{Binding State}"
+                        Header="State" />
+
+                    <DataGridTextColumn
+                        Width="160"
+                        Binding="{Binding City}"
+                        Header="City" />
+
+                    <DataGridTextColumn
+                        Width="*"
+                        Binding="{Binding Depot}"
+                        Header="Depot Name" />
+
+                    <DataGridTextColumn
+                        Width="160"
+                        Binding="{Binding DepotNumber}"
+                        Header="Depot Number" />
+
+                    <!--  Action Column  -->
+                    <DataGridTemplateColumn Width="110" Header="Actions">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Orientation="Horizontal">
+
+                                    <!--  Edit Button  -->
+                                    <Button
+                                        Background="#E0E7FF"
+                                        Click="Button_Click"
+                                        Style="{StaticResource ModernGridActionButton}"
+                                        ToolTip="Edit Depot">
+                                        <TextBlock
+                                            FontFamily="Segoe MDL2 Assets"
+                                            FontSize="12"
+                                            Foreground="#3730A3"
+                                            Text="&#xE70F;" />
+                                    </Button>
+
+                                    <!--  Delete Button  -->
+                                    <Button
+                                        Background="#FEE2E2"
+                                        Click="Button_Click_1"
+                                        Style="{StaticResource ModernGridActionButton}"
+                                        ToolTip="Delete Depot">
+                                        <TextBlock
+                                            FontFamily="Segoe MDL2 Assets"
+                                            FontSize="12"
+                                            Foreground="#991B1B"
+                                            Text="&#xE74D;" />
+                                    </Button>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Border>
+    </Grid>
+</Window>

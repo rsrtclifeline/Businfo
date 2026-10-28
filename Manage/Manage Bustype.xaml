@@ -1,0 +1,140 @@
+﻿<Window
+    x:Class="Businfo.Manage.Manage_Bustype"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Title="Manage Bus Type"
+    Width="1100"
+    Height="650"
+    Background="#F8FAFC"
+    ResizeMode="CanResize"
+    SnapsToDevicePixels="True"
+    UseLayoutRounding="True"
+    WindowStartupLocation="CenterScreen"
+    WindowState="Maximized"
+    mc:Ignorable="d">
+
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!--  Header Section  -->
+        <DockPanel
+            Grid.Row="0"
+            Margin="0,0,0,20"
+            LastChildFill="False">
+            <StackPanel
+                VerticalAlignment="Center"
+                DockPanel.Dock="Left"
+                Orientation="Vertical">
+                <TextBlock
+                    FontSize="22"
+                    FontWeight="Bold"
+                    Foreground="#0F172A"
+                    Text="Manage Bus Types" />
+                <TextBlock
+                    Margin="0,4,0,0"
+                    FontSize="13"
+                    Foreground="#64748B"
+                    Text="Configure and manage bus categories" />
+            </StackPanel>
+
+            <!--  Add Bus Type Button  -->
+            <Button
+                x:Name="btnAddBusType"
+                VerticalAlignment="Center"
+                Click="Button_Click"
+                Content="+ Add Bus Type"
+                DockPanel.Dock="Right"
+                Style="{StaticResource ModernPrimaryButtonStyle}" />
+        </DockPanel>
+
+        <!--  Main DataGrid Container Card  -->
+        <Border
+            Grid.Row="1"
+            Background="#FFFFFF"
+            BorderBrush="#E2E8F0"
+            BorderThickness="1"
+            CornerRadius="10">
+            <Border.Effect>
+                <DropShadowEffect
+                    BlurRadius="16"
+                    Direction="270"
+                    Opacity="0.04"
+                    ShadowDepth="2"
+                    Color="#0F172A" />
+            </Border.Effect>
+
+            <DataGrid
+                x:Name="dgBusTypes"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch"
+                AutoGenerateColumns="False"
+                CanUserAddRows="False"
+                CanUserDeleteRows="False"
+                EnableColumnVirtualization="True"
+                EnableRowVirtualization="True"
+                IsReadOnly="True"
+                ScrollViewer.CanContentScroll="True"
+                SelectionMode="Single"
+                SelectionUnit="FullRow"
+                SnapsToDevicePixels="True"
+                Style="{StaticResource ModernDataGridStyle}"
+                VirtualizingStackPanel.IsVirtualizing="True"
+                VirtualizingStackPanel.VirtualizationMode="Recycling">
+
+                <DataGrid.Columns>
+                    <!--  Bus Type Name Column  -->
+                    <DataGridTextColumn
+                        Width="*"
+                        Binding="{Binding BusType}"
+                        Header="Bus Type" />
+
+                    <!--  Action Buttons Column  -->
+                    <DataGridTemplateColumn Width="120" Header="Actions">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Orientation="Horizontal">
+
+                                    <!--  Edit Button  -->
+                                    <Button
+                                        x:Name="btnEdit"
+                                        Background="#E0E7FF"
+                                        Click="btnEdit_Click"
+                                        Style="{StaticResource ModernGridActionButton}"
+                                        ToolTip="Edit Bus Type">
+                                        <TextBlock
+                                            FontFamily="Segoe MDL2 Assets"
+                                            FontSize="12"
+                                            Foreground="#3730A3"
+                                            Text="&#xE70F;" />
+                                    </Button>
+
+                                    <!--  Delete Button  -->
+                                    <Button
+                                        x:Name="btnDelete"
+                                        Background="#FEE2E2"
+                                        Click="btnDelete_Click"
+                                        Style="{StaticResource ModernGridActionButton}"
+                                        ToolTip="Delete Bus Type">
+                                        <TextBlock
+                                            FontFamily="Segoe MDL2 Assets"
+                                            FontSize="12"
+                                            Foreground="#991B1B"
+                                            Text="&#xE74D;" />
+                                    </Button>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Border>
+    </Grid>
+</Window>

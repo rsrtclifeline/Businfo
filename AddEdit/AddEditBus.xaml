@@ -1,0 +1,400 @@
+﻿<Window
+    x:Class="Businfo.AddEdit.AddEditBus"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="Add / Edit Bus | RSRTC Admin Panel"
+    Width="1000"
+    Height="740"
+    Background="#F8FAFC"
+    ResizeMode="CanResize"
+    SnapsToDevicePixels="True"
+    UseLayoutRounding="True"
+    WindowStartupLocation="CenterScreen"
+    WindowState="Maximized">
+
+    <Window.Resources>
+        <!--  Reusable Subtle Form Label Style  -->
+        <Style x:Key="FormLabelStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="#475569" />
+            <Setter Property="Margin" Value="0,0,0,6" />
+        </Style>
+
+        <!--  Secondary Neutral Action Button  -->
+        <Style x:Key="SecondaryNeutralButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#F1F5F9" />
+            <Setter Property="Foreground" Value="#334155" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Height" Value="38" />
+            <Setter Property="Padding" Value="18,0" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="BorderBrush" Value="#E2E8F0" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border
+                            x:Name="btnBorder"
+                            Padding="{TemplateBinding Padding}"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="8">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="btnBorder" Property="Background" Value="#E2E8F0" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="btnBorder" Property="Background" Value="#CBD5E1" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!--  Danger Outlined Button (Reset)  -->
+        <Style x:Key="DangerOutlinedButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#FEF2F2" />
+            <Setter Property="Foreground" Value="#DC2626" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Height" Value="38" />
+            <Setter Property="Padding" Value="18,0" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="BorderBrush" Value="#FECACA" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border
+                            x:Name="btnBorder"
+                            Padding="{TemplateBinding Padding}"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="8">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="btnBorder" Property="Background" Value="#FEE2E2" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="btnBorder" Property="Background" Value="#FECACA" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!--  Success Button (Save Bus)  -->
+        <Style x:Key="SuccessButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#16A34A" />
+            <Setter Property="Foreground" Value="#FFFFFF" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Height" Value="38" />
+            <Setter Property="Padding" Value="20,0" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border
+                            x:Name="btnBorder"
+                            Padding="{TemplateBinding Padding}"
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="8">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="btnBorder" Property="Background" Value="#15803D" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="btnBorder" Property="Background" Value="#166534" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!--  Top Header Panel  -->
+        <DockPanel
+            Grid.Row="0"
+            Margin="0,0,0,16"
+            LastChildFill="False">
+            <StackPanel
+                VerticalAlignment="Center"
+                DockPanel.Dock="Left"
+                Orientation="Vertical">
+                <TextBlock
+                    FontSize="22"
+                    FontWeight="Bold"
+                    Foreground="#0F172A"
+                    Text="Add / Edit Bus Details" />
+                <TextBlock
+                    Margin="0,3,0,0"
+                    FontSize="13"
+                    Foreground="#64748B"
+                    Text="Configure bus attributes, operators, and route schedule stops" />
+            </StackPanel>
+        </DockPanel>
+
+        <!--  Form Fields Card  -->
+        <Border
+            Grid.Row="1"
+            Margin="0,0,0,16"
+            Background="#FFFFFF"
+            BorderBrush="#E2E8F0"
+            BorderThickness="1"
+            CornerRadius="10">
+            <Border.Effect>
+                <DropShadowEffect
+                    BlurRadius="16"
+                    Direction="270"
+                    Opacity="0.04"
+                    ShadowDepth="2"
+                    Color="#0F172A" />
+            </Border.Effect>
+
+            <StackPanel Margin="20,16" Orientation="Vertical">
+                <!--  Top Row Inputs  -->
+                <WrapPanel Margin="0,0,0,14" HorizontalAlignment="Stretch">
+                    <StackPanel Width="205" Margin="0,0,16,10">
+                        <TextBlock Style="{StaticResource FormLabelStyle}" Text="Line" />
+                        <ComboBox
+                            x:Name="combo_line"
+                            Height="36"
+                            IsEditable="False">
+                            <ComboBoxItem Content="Roadways" />
+                            <ComboBoxItem Content="Private" />
+                        </ComboBox>
+                    </StackPanel>
+
+                    <StackPanel Width="205" Margin="0,0,16,10">
+                        <TextBlock Style="{StaticResource FormLabelStyle}" Text="From Station" />
+                        <ComboBox
+                            x:Name="combo_From"
+                            Height="36"
+                            IsEditable="False" />
+                    </StackPanel>
+
+                    <StackPanel Width="205" Margin="0,0,16,10">
+                        <TextBlock Style="{StaticResource FormLabelStyle}" Text="To Destination" />
+                        <ComboBox
+                            x:Name="combo_To"
+                            Height="36"
+                            IsEditable="False" />
+                    </StackPanel>
+
+                    <StackPanel Width="240" Margin="0,0,0,10">
+                        <TextBlock Style="{StaticResource FormLabelStyle}" Text="Route Summary" />
+                        <TextBox
+                            x:Name="route"
+                            Height="36"
+                            Style="{StaticResource ModernSearchBox}" />
+                    </StackPanel>
+                </WrapPanel>
+
+                <!--  Bottom Row Inputs  -->
+                <WrapPanel HorizontalAlignment="Stretch">
+                    <StackPanel Width="205" Margin="0,0,16,0">
+                        <TextBlock Style="{StaticResource FormLabelStyle}" Text="Assigned Vendor" />
+                        <ComboBox
+                            x:Name="combo_Vendor"
+                            Height="36"
+                            IsEditable="False" />
+                    </StackPanel>
+
+                    <StackPanel Width="205" Margin="0,0,16,0">
+                        <TextBlock Style="{StaticResource FormLabelStyle}" Text="Bus Type" />
+                        <ComboBox
+                            x:Name="combo_BusType"
+                            Height="36"
+                            IsEditable="False" />
+                    </StackPanel>
+
+                    <StackPanel Width="205" Margin="0,0,16,0">
+                        <TextBlock Style="{StaticResource FormLabelStyle}" Text="Operational Depot" />
+                        <ComboBox
+                            x:Name="combo_Depot"
+                            Height="36"
+                            IsEditable="False" />
+                    </StackPanel>
+                </WrapPanel>
+            </StackPanel>
+        </Border>
+
+        <!--  Stops DataGrid Container Card  -->
+        <Border
+            Grid.Row="2"
+            Background="#FFFFFF"
+            BorderBrush="#E2E8F0"
+            BorderThickness="1"
+            CornerRadius="10">
+            <Border.Effect>
+                <DropShadowEffect
+                    BlurRadius="16"
+                    Direction="270"
+                    Opacity="0.04"
+                    ShadowDepth="2"
+                    Color="#0F172A" />
+            </Border.Effect>
+
+            <DataGrid
+                x:Name="StopsDataGrid"
+                AllowDrop="True"
+                AutoGenerateColumns="False"
+                CanUserAddRows="False"
+                CanUserDeleteRows="False"
+                Drop="StopsDataGrid_Drop"
+                MouseMove="StopsDataGrid_MouseMove"
+                PreviewMouseLeftButtonDown="StopsDataGrid_PreviewMouseLeftButtonDown"
+                RowHeaderWidth="0"
+                SelectionMode="Single"
+                SelectionUnit="FullRow"
+                SnapsToDevicePixels="True"
+                Style="{StaticResource ModernDataGridStyle}">
+
+                <DataGrid.Columns>
+                    <DataGridTextColumn
+                        Width="1.6*"
+                        Binding="{Binding Station}"
+                        Header="Station" />
+
+                    <DataGridTextColumn
+                        Width="*"
+                        Binding="{Binding Arrival}"
+                        Header="Arrival" />
+
+                    <DataGridTextColumn
+                        Width="*"
+                        Binding="{Binding Departure}"
+                        Header="Departure" />
+
+                    <DataGridTextColumn
+                        Width="*"
+                        Binding="{Binding Distance}"
+                        Header="Distance (km)" />
+
+                    <DataGridTextColumn
+                        Width="90"
+                        Binding="{Binding Day}"
+                        Header="Day" />
+
+                    <!--  Action Column  -->
+                    <DataGridTemplateColumn Width="135" Header="Actions">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Orientation="Horizontal">
+
+                                    <!--  Edit Row  -->
+                                    <Button
+                                        Background="#E0E7FF"
+                                        Click="Button_Click_2"
+                                        Style="{StaticResource ModernGridActionButton}"
+                                        ToolTip="Edit Row">
+                                        <TextBlock
+                                            FontFamily="Segoe MDL2 Assets"
+                                            FontSize="12"
+                                            Foreground="#3730A3"
+                                            Text="&#xE70F;" />
+                                    </Button>
+
+                                    <!--  Add Next Row  -->
+                                    <Button
+                                        Background="#DCFCE7"
+                                        Click="Button_Click_4"
+                                        Style="{StaticResource ModernGridActionButton}"
+                                        ToolTip="Add Next Row">
+                                        <TextBlock
+                                            FontFamily="Segoe MDL2 Assets"
+                                            FontSize="12"
+                                            Foreground="#166534"
+                                            Text="&#xE710;" />
+                                    </Button>
+
+                                    <!--  Delete Row  -->
+                                    <Button
+                                        Background="#FEE2E2"
+                                        Click="Button_Click_3"
+                                        Style="{StaticResource ModernGridActionButton}"
+                                        ToolTip="Delete Row">
+                                        <TextBlock
+                                            FontFamily="Segoe MDL2 Assets"
+                                            FontSize="12"
+                                            Foreground="#991B1B"
+                                            Text="&#xE74D;" />
+                                    </Button>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Border>
+
+        <!--  Bottom Action Buttons Footer  -->
+        <DockPanel
+            Grid.Row="3"
+            Margin="0,18,0,0"
+            LastChildFill="False">
+            <!--  Left Actions  -->
+            <StackPanel
+                VerticalAlignment="Center"
+                DockPanel.Dock="Left"
+                Orientation="Horizontal">
+                <Button
+                    Click="Button_Click_AddStop"
+                    Content="+ Add Stop"
+                    Style="{StaticResource ModernPrimaryButtonStyle}" />
+            </StackPanel>
+
+            <!--  Right Controls  -->
+            <StackPanel
+                VerticalAlignment="Center"
+                DockPanel.Dock="Right"
+                Orientation="Horizontal">
+                <!--  Reverse Route  -->
+                <Button
+                    Margin="0,0,10,0"
+                    Click="Button_Click"
+                    Content="Reverse Route"
+                    Style="{StaticResource SecondaryNeutralButtonStyle}" />
+
+                <!--  Reset Form  -->
+                <Button
+                    Margin="0,0,10,0"
+                    Click="Button_Click_1"
+                    Content="Reset"
+                    Style="{StaticResource DangerOutlinedButtonStyle}" />
+
+                <!--  Save Bus  -->
+                <Button
+                    Click="Button_Click_SaveBus"
+                    Content="Save Bus"
+                    Style="{StaticResource SuccessButtonStyle}" />
+            </StackPanel>
+        </DockPanel>
+    </Grid>
+</Window>

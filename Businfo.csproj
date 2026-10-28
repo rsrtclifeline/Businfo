@@ -1,0 +1,44 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="bus.png" />
+    <None Remove="city.png" />
+    <None Remove="depot.png" />
+    <None Remove="vendor.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FirebaseDatabase.net" Version="5.0.0" />
+    <PackageReference Include="FirebaseStorage.net" Version="1.0.3" />
+    <PackageReference Include="Google.Cloud.Firestore" Version="3.10.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4-beta1" />
+    <PackageReference Include="SocketIOClient" Version="4.0.5" />
+    <PackageReference Include="System.Net.Http.Json" Version="11.0.0-rc.3.26522.148" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="bus.png" />
+    <Resource Include="city.png" />
+    <Resource Include="depot.png" />
+    <Resource Include="vendor.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Helper\sAndDistrict.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Theme\Dark\" />
+  </ItemGroup>
+
+</Project>
