@@ -203,17 +203,290 @@ namespace Businfo.Manage
                 }
             }
         }
+            
+// Import Excel Button
+private async void btnImportExcel_Click(object sender, RoutedEventArgs e)
+{
+    try
+    {
+        OpenFileDialog openFileDialog = new OpenFileDialog
+        {
+            Title = "Select RSRTC Bus Timetable Excel File",
+            Filter = "Excel Workbook (*.xlsx)|*.xlsx",
+            CheckFileExists = true
+        };
 
-        // Import Excel Button (Temporary)
-        private void btnImportExcel_Click(object sender, RoutedEventArgs e)
+        if (openFileDialog.ShowDialog() != true)
+            return;
+
+        // Load existing metadata
+        var citiesData = await ApiClient.GetCitiesAsync();
+        var metadata = await ApiClient.GetMetadataAsync();
+
+        var cities = citiesData?
+            .Where(c => !string.IsNullOrWhiteSpace(c.CityName))
+            .Select(c => c.CityName.Trim())
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList() ?? new List<string>();
+
+        var busTypes = metadata?.busTypes ?? new List<string>();
+        var depots = metadata?.depots ?? new List<string>();
+
+        if (cities.Count == 0 || busTypes.Count == 0 || depots.Count == 0)
         {
             MessageBox.Show(
-                "Excel Import feature will be available soon!",
-                "RSRTC LifeLine",
+                "Existing Cities, Bus Types ya Depots ka data load nahi ho paya. Internet/API connection check karein.",
+                "Metadata Error",
                 MessageBoxButton.OK,
-                MessageBoxImage.Information
+                MessageBoxImage.Error
             );
+            return;
         }
+
+        var importedBuses = new List<BusData>();
+        var errors = new List<string>();
+
+        using (var workbook = new XLWorkbook(openFileDialog.FileName))
+        {
+            var worksheet = workbook.Worksheet("Bus Timetable");
+            int lastRow = worksheet.LastRowUsed()?.RowNumber() ?? 1;
+
+            BusData currentBus = null;
+
+            for (int row = 2; row <= lastRow; row++)
+            {
+                string GetValue(int column)
+                {
+                    return worksheet.Cell(row, column).GetFormattedString().Trim();
+                }
+
+                string line = GetValue(1);
+                string busType = GetValue(2);
+                string depot = GetValue(3);
+                string from = GetValue(4);
+                string departure = GetValue(5);
+                string to = GetValue(6);
+                string arrival = GetValue(7);
+                string route = GetValue(8);
+
+                string station = GetValue(9);
+                string stopArrival = GetValue(10);
+                string stopDeparture = GetValue(11);
+                string distance = GetValue(12);
+                string day = GetValue(13);
+
+                bool rowIsEmpty = Enumerable.Range(1, 13)
+                    .All(c => string.IsNullOrWhiteSpace(
+                        worksheet.Cell(row, c).GetFormattedString()));
+
+                if (rowIsEmpty)
+                    continue;
+
+                // A non-empty Bus Line starts a new bus
+                if (!string.IsNullOrWhiteSpace(line))
+                {
+                    if (currentBus != null)
+                        importedBuses.Add(currentBus);
+
+                    string matchedFrom = cities.FirstOrDefault(
+                        c => string.Equals(c, from, StringComparison.OrdinalIgnoreCase));
+
+                    string matchedTo = cities.FirstOrDefault(
+                        c => string.Equals(c, to, StringComparison.OrdinalIgnoreCase));
+
+                    string matchedBusType = busTypes.FirstOrDefault(
+                        b => string.Equals(b?.Trim(), busType, StringComparison.OrdinalIgnoreCase));
+
+                    string matchedDepot = depots.FirstOrDefault(
+                        d => string.Equals(d?.Trim(), depot, StringComparison.OrdinalIgnoreCase));
+
+                    if (string.IsNullOrWhiteSpace(busType) ||
+                        matchedBusType == null)
+                        errors.Add($"Row {row}: Invalid or missing Bus Type: {busType}");
+
+                    if (string.IsNullOrWhiteSpace(depot) ||
+                        matchedDepot == null)
+                        errors.Add($"Row {row}: Invalid or missing Depot: {depot}");
+
+                    if (string.IsNullOrWhiteSpace(from) || matchedFrom == null)
+                        errors.Add($"Row {row}: From City does not exist: {from}");
+
+                    if (string.IsNullOrWhiteSpace(to) || matchedTo == null)
+                        errors.Add($"Row {row}: To City does not exist: {to}");
+
+                    if (string.IsNullOrWhiteSpace(departure))
+                        errors.Add($"Row {row}: Departure is missing.");
+
+                    if (string.IsNullOrWhiteSpace(arrival))
+                        errors.Add($"Row {row}: Arrival is missing.");
+
+                    if (string.IsNullOrWhiteSpace(route))
+                        errors.Add($"Row {row}: Route is missing.");
+
+                    currentBus = new BusData
+                    {
+                        id = "0",
+                        Line = line,
+                        BusType = matchedBusType ?? busType,
+                        Depot = matchedDepot ?? depot,
+                        From = matchedFrom ?? from,
+                        To = matchedTo ?? to,
+                        Time = $"{departure},{arrival}",
+                        Route = route,
+                        Vendor = "RSRTC",
+                        GUID = Guid.NewGuid().ToString(),
+                        Stops = new List<StopData>()
+                    };
+                }
+                else if (currentBus == null)
+                {
+                    errors.Add($"Row {row}: Bus Line missing. Har nayi bus ke first row mein Bus Line zaroor likhein.");
+                    continue;
+                }
+
+                // Add stoppage when any stoppage field is filled
+                bool hasStopData =
+                    !string.IsNullOrWhiteSpace(station) ||
+                    !string.IsNullOrWhiteSpace(stopArrival) ||
+                    !string.IsNullOrWhiteSpace(stopDeparture) ||
+                    !string.IsNullOrWhiteSpace(distance) ||
+                    !string.IsNullOrWhiteSpace(day);
+
+                if (hasStopData)
+                {
+                    string matchedStation = cities.FirstOrDefault(
+                        c => string.Equals(c, station, StringComparison.OrdinalIgnoreCase));
+
+                    if (matchedStation == null)
+                    {
+                        errors.Add($"Row {row}: Stoppage City does not exist: {station}");
+                        continue;
+                    }
+
+                    if (string.IsNullOrWhiteSpace(stopArrival) ||
+                        string.IsNullOrWhiteSpace(stopDeparture) ||
+                        string.IsNullOrWhiteSpace(distance) ||
+                        string.IsNullOrWhiteSpace(day))
+                    {
+                        errors.Add($"Row {row}: Stoppage ke Arrival, Departure, Distance aur Day sab bharna zaroori hai.");
+                        continue;
+                    }
+
+                    currentBus.Stops.Add(new StopData
+                    {
+                        Station = matchedStation,
+                        Arrival = stopArrival,
+                        Departure = stopDeparture,
+                        Distance = distance,
+                        Day = day,
+                        GUID = Guid.NewGuid().ToString()
+                    });
+                }
+            }
+
+            if (currentBus != null)
+                importedBuses.Add(currentBus);
+        }
+
+        // Do not save anything if Excel has validation errors
+        if (errors.Count > 0)
+        {
+            string errorReport = string.Join(
+                Environment.NewLine,
+                errors.Take(25)
+            );
+
+            if (errors.Count > 25)
+                errorReport += Environment.NewLine +
+                    $"...aur {errors.Count - 25} errors.";
+
+            MessageBox.Show(
+                "Excel mein kuch errors mile hain. Koi bus save nahi hui.\n\n" +
+                errorReport,
+                "Excel Validation Failed",
+                MessageBoxButton.OK,
+                MessageBoxImage.Warning
+            );
+
+            return;
+        }
+
+        if (importedBuses.Count == 0)
+        {
+            MessageBox.Show(
+                "Excel file mein koi bus record nahi mila.",
+                "No Records",
+                MessageBoxButton.OK,
+                MessageBoxImage.Warning
+            );
+            return;
+        }
+
+        var confirm = MessageBox.Show(
+            $"Excel mein {importedBuses.Count} buses mili hain.\n\n" +
+            "Vendor: RSRTC\n" +
+            "Existing Cities, Bus Types aur Depots verify ho chuke hain.\n\n" +
+            "Kya aap in buses ko server par import karna chahte hain?",
+            "Confirm Excel Import",
+            MessageBoxButton.YesNo,
+            MessageBoxImage.Question
+        );
+
+        if (confirm != MessageBoxResult.Yes)
+            return;
+
+        int successCount = 0;
+        var failedRecords = new List<string>();
+
+        foreach (var bus in importedBuses)
+        {
+            var result = await ApiClient.SaveBusAsync(bus, true);
+
+            if (result.Success)
+            {
+                successCount++;
+            }
+            else
+            {
+                failedRecords.Add(
+                    $"{bus.Line} ({bus.From} → {bus.To}): {result.Message}"
+                );
+            }
+        }
+
+        LoadBusData();
+
+        string finalMessage =
+            $"Import Complete!\n\n" +
+            $"Successfully Saved: {successCount}\n" +
+            $"Failed: {failedRecords.Count}";
+
+        if (failedRecords.Count > 0)
+        {
+            finalMessage += "\n\nFailed Records:\n" +
+                string.Join("\n", failedRecords.Take(10));
+        }
+
+        MessageBox.Show(
+            finalMessage,
+            "RSRTC LifeLine Import Result",
+            MessageBoxButton.OK,
+            failedRecords.Count == 0
+                ? MessageBoxImage.Information
+                : MessageBoxImage.Warning
+        );
+    }
+    catch (Exception ex)
+    {
+        MessageBox.Show(
+            "Excel Import Error:\n" + ex.Message,
+            "Import Error",
+            MessageBoxButton.OK,
+            MessageBoxImage.Error
+        );
+    }
+}
+
 
         // Download Excel Template
         private void btnDownloadTemplate_Click(object sender, RoutedEventArgs e)
