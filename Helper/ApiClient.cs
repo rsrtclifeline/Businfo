@@ -1,4 +1,5 @@
-﻿using Businfo.Manage;
+
+using Businfo.Manage;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -31,6 +32,7 @@ namespace Businfo.Helper
         }
 
         // ================= VENDOR METHODS =================
+
         public static async Task<List<VendorModel>> GetVendorsAsync()
         {
             try
@@ -61,9 +63,8 @@ namespace Businfo.Helper
             {
                 var res = await http.PostAsJsonAsync("/api/admin/vendors", vendor);
                 if (res.IsSuccessStatusCode)
-                {
                     return (true, string.Empty);
-                }
+
                 var err = await res.Content.ReadAsStringAsync();
                 return (false, $"Status {res.StatusCode}: {err}");
             }
@@ -87,6 +88,7 @@ namespace Businfo.Helper
         }
 
         // ================= CITY METHODS =================
+
         public static async Task<List<CityModel>> GetCitiesAsync()
         {
             try
@@ -117,9 +119,8 @@ namespace Businfo.Helper
             {
                 var res = await http.PostAsJsonAsync("/api/admin/cities", city);
                 if (res.IsSuccessStatusCode)
-                {
                     return (true, string.Empty);
-                }
+
                 var err = await res.Content.ReadAsStringAsync();
                 return (false, $"Status {res.StatusCode}: {err}");
             }
@@ -142,8 +143,8 @@ namespace Businfo.Helper
             }
         }
 
-
         // ================= DEPOT METHODS =================
+
         public static async Task<List<DepotData>> GetDepotsAsync()
         {
             try
@@ -174,9 +175,8 @@ namespace Businfo.Helper
             {
                 var res = await http.PostAsJsonAsync("/api/admin/depots", depot);
                 if (res.IsSuccessStatusCode)
-                {
                     return (true, string.Empty);
-                }
+
                 var err = await res.Content.ReadAsStringAsync();
                 return (false, $"Status {res.StatusCode}: {err}");
             }
@@ -200,6 +200,7 @@ namespace Businfo.Helper
         }
 
         // ================= BUS TYPE METHODS =================
+
         public static async Task<List<BusTypeModel>> GetBusTypesAsync()
         {
             try
@@ -230,9 +231,8 @@ namespace Businfo.Helper
             {
                 var res = await http.PostAsJsonAsync("/api/admin/bustypes", busType);
                 if (res.IsSuccessStatusCode)
-                {
                     return (true, string.Empty);
-                }
+
                 var err = await res.Content.ReadAsStringAsync();
                 return (false, $"Status {res.StatusCode}: {err}");
             }
@@ -256,6 +256,7 @@ namespace Businfo.Helper
         }
 
         // ================= BUS METHODS =================
+
         public static async Task<List<BusData>> GetBusesAsync()
         {
             try
@@ -265,6 +266,34 @@ namespace Businfo.Helper
             catch
             {
                 return new List<BusData>();
+            }
+        }
+
+        // Safe method for duplicate checking
+        public static async Task<(bool Success, List<BusData> Buses, string Message)> GetBusesForDuplicateCheckAsync()
+        {
+            try
+            {
+                var response = await http.GetAsync("/api/admin/buses");
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var error = await response.Content.ReadAsStringAsync();
+                    return (false, null, $"Status {response.StatusCode}: {error}");
+                }
+
+                var buses = await response.Content.ReadFromJsonAsync<List<BusData>>();
+
+                if (buses == null)
+                {
+                    return (false, null, "Server se bus data nahi mila.");
+                }
+
+                return (true, buses, string.Empty);
+            }
+            catch (Exception ex)
+            {
+                return (false, null, ex.Message);
             }
         }
 
@@ -289,9 +318,8 @@ namespace Businfo.Helper
                     : await http.PutAsJsonAsync($"/api/admin/buses/{bus.id}", bus);
 
                 if (res.IsSuccessStatusCode)
-                {
                     return (true, string.Empty);
-                }
+
                 var err = await res.Content.ReadAsStringAsync();
                 return (false, $"Status {res.StatusCode}: {err}");
             }
@@ -315,6 +343,7 @@ namespace Businfo.Helper
         }
 
         // ================= METADATA (Dropdowns) =================
+
         public static async Task<MetadataResponse> GetMetadataAsync()
         {
             try
