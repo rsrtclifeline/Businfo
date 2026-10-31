@@ -1,4 +1,6 @@
 ﻿using Businfo.AddEdit;
+using ClosedXML.Excel;
+using Microsoft.Win32;
 using Businfo.Helper;
 using System;
 using System.Collections.Generic;
@@ -194,7 +196,76 @@ private void btnImportExcel_Click(object sender, RoutedEventArgs e)
         MessageBoxImage.Information
     );
 }  // Download Excel Template
+// Download Excel Template
 private void btnDownloadTemplate_Click(object sender, RoutedEventArgs e)
+{
+    try
+    {
+        SaveFileDialog saveFileDialog = new SaveFileDialog
+        {
+            Title = "Download RSRTC Excel Template",
+            FileName = "RSRTC_Bus_Timetable_Template.xlsx",
+            Filter = "Excel Workbook (*.xlsx)|*.xlsx"
+        };
+
+        if (saveFileDialog.ShowDialog() == true)
+        {
+            using (var workbook = new XLWorkbook())
+            {
+                var worksheet = workbook.Worksheets.Add("Bus Timetable");
+
+                string[] headers =
+                {
+                    "Bus Line",
+                    "Bus Type",
+                    "Depot",
+                    "From",
+                    "Departure",
+                    "To",
+                    "Arrival",
+                    "Route",
+                    "Stoppage",
+                    "Stop Arrival",
+                    "Stop Departure",
+                    "Distance KM",
+                    "Day"
+                };
+
+                for (int i = 0; i < headers.Length; i++)
+                {
+                    worksheet.Cell(1, i + 1).Value = headers[i];
+                }
+
+                var header = worksheet.Range(1, 1, 1, headers.Length);
+                header.Style.Font.Bold = true;
+                header.Style.Font.FontColor = XLColor.White;
+                header.Style.Fill.BackgroundColor = XLColor.DarkBlue;
+                header.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+
+                worksheet.SheetView.FreezeRows(1);
+                worksheet.Columns().AdjustToContents();
+
+                workbook.SaveAs(saveFileDialog.FileName);
+            }
+
+            MessageBox.Show(
+                "Excel Template successfully saved!",
+                "RSRTC LifeLine",
+                MessageBoxButton.OK,
+                MessageBoxImage.Information
+            );
+        }
+    }
+    catch (Exception ex)
+    {
+        MessageBox.Show(
+            "Template banane me error: " + ex.Message,
+            "Error",
+            MessageBoxButton.OK,
+            MessageBoxImage.Error
+        );
+    }
+}
 {
     MessageBox.Show(
         "Excel Template feature is being prepared!",
