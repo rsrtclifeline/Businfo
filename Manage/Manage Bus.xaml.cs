@@ -256,22 +256,3 @@ private void btnDownloadTemplate_Click(object sender, RoutedEventArgs e)
             );
         }
     }
-    catch (Exception ex)
-    {
-        MessageBox.Show(
-            "Template banane me error: " + ex.Message,
-            "Error",
-            MessageBoxButton.OK,
-            MessageBoxImage.Error
-        );
-    }
-}
-{
-    MessageBox.Show(
-        "Excel Template feature is being prepared!",
-        "RSRTC LifeLine",
-        MessageBoxButton.OK,
-        MessageBoxImage.Information
-    );
-}}
-}
