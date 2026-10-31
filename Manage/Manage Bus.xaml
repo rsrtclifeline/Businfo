@@ -69,6 +69,13 @@
                     Margin="10,0,0,0"
                     IsEditable="False"
                     SelectionChanged="cmbVendorFilter_SelectionChanged" />
+<!-- Download Excel Template -->
+<Button
+    Margin="12,0,0,0"
+    Click="btnDownloadTemplate_Click"
+    Content="📄 Download Template"
+    Style="{StaticResource ModernPrimaryButtonStyle}" /> 
+
 
                 <!-- Import Excel Button -->
                 <Button
