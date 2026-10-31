@@ -193,5 +193,14 @@ private void btnImportExcel_Click(object sender, RoutedEventArgs e)
         MessageBoxButton.OK,
         MessageBoxImage.Information
     );
-}  }
+}  // Download Excel Template
+private void btnDownloadTemplate_Click(object sender, RoutedEventArgs e)
+{
+    MessageBox.Show(
+        "Excel Template feature is being prepared!",
+        "RSRTC LifeLine",
+        MessageBoxButton.OK,
+        MessageBoxImage.Information
+    );
+}}
 }
