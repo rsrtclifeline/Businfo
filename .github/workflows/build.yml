@@ -1,0 +1,31 @@
+
+name: Build RSRTC LifeLine EXE
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore Packages
+        run: dotnet restore Businfo.sln
+
+      - name: Build EXE
+        run: dotnet publish Businfo.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=false -o ./publish
+
+      - name: Upload EXE Files
+        uses: actions/upload-artifact@v4
+        with:
+          name: RSRTC-LifeLine-Windows-EXE
+          path: ./publish/
