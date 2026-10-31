@@ -184,5 +184,14 @@ namespace Businfo.Manage
                 }
             }
         }
-    }
+  // Import Excel Button (Temporary)
+private void btnImportExcel_Click(object sender, RoutedEventArgs e)
+{
+    MessageBox.Show(
+        "Excel Import feature will be available soon!",
+        "RSRTC LifeLine",
+        MessageBoxButton.OK,
+        MessageBoxImage.Information
+    );
+}  }
 }
