@@ -1,4 +1,4 @@
-﻿using Businfo.AddEdit;
+using Businfo.AddEdit;
 using ClosedXML.Excel;
 using Microsoft.Win32;
 using Businfo.Helper;
@@ -23,7 +23,7 @@ namespace Businfo.Manage
             InitializeComponent();
             BusDataGrid.ItemsSource = DisplayedBuses;
 
-            isInitialized = true; // Controls ready hone ke baad hi filtering allow hogi
+            isInitialized = true;
 
             LoadVendorsDropdown();
             LoadBusData();
@@ -39,7 +39,12 @@ namespace Businfo.Manage
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Server se data load karne me error: {ex.Message}", "Connection Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(
+                    $"Server se data load karne me error: {ex.Message}",
+                    "Connection Error",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error
+                );
             }
         }
 
@@ -49,6 +54,7 @@ namespace Businfo.Manage
             {
                 var meta = await ApiClient.GetMetadataAsync();
                 var vendors = new List<string> { "All Vendors" };
+
                 if (meta?.vendors != null)
                 {
                     vendors.AddRange(meta.vendors);
@@ -62,11 +68,11 @@ namespace Businfo.Manage
 
         private void ApplyFilters()
         {
-            // Null Guard: Agar controls ya list abhi instantiate nahi hue toh aage mat badho
             if (!isInitialized || SearchTextBox == null || cmbVendorFilter == null || masterBusList == null)
                 return;
 
             var searchTxt = SearchTextBox.Text?.Trim().ToLower() ?? "";
+
             if (searchTxt == "search route, city, bus...")
                 searchTxt = "";
 
@@ -76,14 +82,12 @@ namespace Businfo.Manage
             {
                 if (b == null) return false;
 
-                // 1. Vendor Filter Check
                 bool matchVendor = string.IsNullOrEmpty(selectedVendor) ||
                                    selectedVendor == "All Vendors" ||
                                    string.Equals(b.Vendor, selectedVendor, StringComparison.OrdinalIgnoreCase);
 
                 if (!matchVendor) return false;
 
-                // 2. Search Box Filter Check
                 if (string.IsNullOrEmpty(searchTxt)) return true;
 
                 return (!string.IsNullOrEmpty(b.Line) && b.Line.ToLower().Contains(searchTxt)) ||
@@ -95,6 +99,7 @@ namespace Businfo.Manage
             }).ToList();
 
             DisplayedBuses.Clear();
+
             foreach (var b in filtered)
             {
                 DisplayedBuses.Add(b);
@@ -171,88 +176,114 @@ namespace Businfo.Manage
         {
             if (BusDataGrid.SelectedItem is BusData s)
             {
-                var result = MessageBox.Show($"Route '{s.Line}' ({s.From} -> {s.To}) delete karein?", "Confirm Delete", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                var result = MessageBox.Show(
+                    $"Route '{s.Line}' ({s.From} -> {s.To}) delete karein?",
+                    "Confirm Delete",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Warning
+                );
+
                 if (result == MessageBoxResult.Yes)
                 {
                     bool success = await ApiClient.DeleteBusAsync(s.id);
+
                     if (success)
                     {
                         LoadBusData();
                     }
                     else
                     {
-                        MessageBox.Show("Bus delete karne me error aaya.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        MessageBox.Show(
+                            "Bus delete karne me error aaya.",
+                            "Error",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Error
+                        );
                     }
                 }
             }
         }
-  // Import Excel Button (Temporary)
-private void btnImportExcel_Click(object sender, RoutedEventArgs e)
-{
-    MessageBox.Show(
-        "Excel Import feature will be available soon!",
-        "RSRTC LifeLine",
-        MessageBoxButton.OK,
-        MessageBoxImage.Information
-    );
-}  // Download Excel Template
-// Download Excel Template
-private void btnDownloadTemplate_Click(object sender, RoutedEventArgs e)
-{
-    try
-    {
-        SaveFileDialog saveFileDialog = new SaveFileDialog
+
+        // Import Excel Button (Temporary)
+        private void btnImportExcel_Click(object sender, RoutedEventArgs e)
         {
-            Title = "Download RSRTC Excel Template",
-            FileName = "RSRTC_Bus_Timetable_Template.xlsx",
-            Filter = "Excel Workbook (*.xlsx)|*.xlsx"
-        };
-
-        if (saveFileDialog.ShowDialog() == true)
-        {
-            using (var workbook = new XLWorkbook())
-            {
-                var worksheet = workbook.Worksheets.Add("Bus Timetable");
-
-                string[] headers =
-                {
-                    "Bus Line",
-                    "Bus Type",
-                    "Depot",
-                    "From",
-                    "Departure",
-                    "To",
-                    "Arrival",
-                    "Route",
-                    "Stoppage",
-                    "Stop Arrival",
-                    "Stop Departure",
-                    "Distance KM",
-                    "Day"
-                };
-
-                for (int i = 0; i < headers.Length; i++)
-                {
-                    worksheet.Cell(1, i + 1).Value = headers[i];
-                }
-
-                var header = worksheet.Range(1, 1, 1, headers.Length);
-                header.Style.Font.Bold = true;
-                header.Style.Font.FontColor = XLColor.White;
-                header.Style.Fill.BackgroundColor = XLColor.DarkBlue;
-                header.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
-
-                worksheet.SheetView.FreezeRows(1);
-                worksheet.Columns().AdjustToContents();
-
-                workbook.SaveAs(saveFileDialog.FileName);
-            }
-
             MessageBox.Show(
-                "Excel Template successfully saved!",
+                "Excel Import feature will be available soon!",
                 "RSRTC LifeLine",
                 MessageBoxButton.OK,
                 MessageBoxImage.Information
             );
         }
+
+        // Download Excel Template
+        private void btnDownloadTemplate_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                SaveFileDialog saveFileDialog = new SaveFileDialog
+                {
+                    Title = "Download RSRTC Excel Template",
+                    FileName = "RSRTC_Bus_Timetable_Template.xlsx",
+                    Filter = "Excel Workbook (*.xlsx)|*.xlsx"
+                };
+
+                if (saveFileDialog.ShowDialog() == true)
+                {
+                    using (var workbook = new XLWorkbook())
+                    {
+                        var worksheet = workbook.Worksheets.Add("Bus Timetable");
+
+                        string[] headers =
+                        {
+                            "Bus Line",
+                            "Bus Type",
+                            "Depot",
+                            "From",
+                            "Departure",
+                            "To",
+                            "Arrival",
+                            "Route",
+                            "Stoppage",
+                            "Stop Arrival",
+                            "Stop Departure",
+                            "Distance KM",
+                            "Day"
+                        };
+
+                        for (int i = 0; i < headers.Length; i++)
+                        {
+                            worksheet.Cell(1, i + 1).Value = headers[i];
+                        }
+
+                        var header = worksheet.Range(1, 1, 1, headers.Length);
+                        header.Style.Font.Bold = true;
+                        header.Style.Font.FontColor = XLColor.White;
+                        header.Style.Fill.BackgroundColor = XLColor.DarkBlue;
+                        header.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+
+                        worksheet.SheetView.FreezeRows(1);
+                        worksheet.Columns().AdjustToContents();
+
+                        workbook.SaveAs(saveFileDialog.FileName);
+                    }
+
+                    MessageBox.Show(
+                        "Excel Template successfully saved!",
+                        "RSRTC LifeLine",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Information
+                    );
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    "Template banane me error: " + ex.Message,
+                    "Error",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error
+                );
+            }
+        }
     }
+}
