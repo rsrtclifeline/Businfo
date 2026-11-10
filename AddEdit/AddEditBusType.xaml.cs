@@ -1,4 +1,5 @@
-﻿using Businfo.Helper;
+﻿#nullable enable
+using Businfo.Helper;
 using Businfo.Manage;
 using System;
 using System.Windows;
@@ -8,9 +9,10 @@ namespace Businfo.AddEdit
     public partial class AddEditBusType : Window
     {
         private string id = "0";
-        private bool isNew = true;
+        private readonly bool isNew = true;
         private string currentGuid = string.Empty;
 
+        // 1. Add New Constructor
         public AddEditBusType()
         {
             InitializeComponent();
@@ -23,11 +25,25 @@ namespace Businfo.AddEdit
 #endif
         }
 
+        // 2. Direct Model Injection Constructor (0ms launch, zero network overhead)
+        public AddEditBusType(BusTypeModel model)
+        {
+            InitializeComponent();
+            isNew = false;
+            id = model.id ?? "0";
+            currentGuid = !string.IsNullOrWhiteSpace(model.GUID) ? model.GUID : Guid.NewGuid().ToString();
+
+            txtBusType.Text = model.BusType ?? string.Empty;
+        }
+
+        // 3. Fallback ID Constructor (Only when instance is not already in memory)
         public AddEditBusType(string id)
         {
             InitializeComponent();
             this.id = id;
             isNew = false;
+            currentGuid = Guid.NewGuid().ToString();
+
             LoadBusTypeData();
         }
 
@@ -35,7 +51,7 @@ namespace Businfo.AddEdit
         private void FillDummyData()
         {
             var types = new[] { "Express", "Super Express", "AC Sleeper 2+1", "Ordinary non-stop", "Volvo Multi-Axle" };
-            txtBusType.Text = types[new Random().Next(types.Length)];
+            txtBusType.Text = types[Random.Shared.Next(types.Length)];
         }
 #endif
 
@@ -46,19 +62,19 @@ namespace Businfo.AddEdit
                 var data = await ApiClient.GetBusTypeByIdAsync(id);
                 if (data != null)
                 {
-                    txtBusType.Text = data.BusType ?? "";
+                    txtBusType.Text = data.BusType ?? string.Empty;
                     currentGuid = string.IsNullOrWhiteSpace(data.GUID) ? Guid.NewGuid().ToString() : data.GUID;
                 }
                 else
                 {
                     MessageBox.Show("Bus Type data nahi mila.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    this.Close();
+                    Close();
                 }
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Error loading bus type: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                this.Close();
+                Close();
             }
         }
 
@@ -83,7 +99,7 @@ namespace Businfo.AddEdit
             if (success)
             {
                 MessageBox.Show(isNew ? "New bus type added successfully!" : "Bus type updated successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
-                this.Close();
+                Close();
             }
             else
             {
@@ -93,7 +109,7 @@ namespace Businfo.AddEdit
 
         private void btnDiscard_Click(object sender, RoutedEventArgs e)
         {
-            this.Close();
+            Close();
         }
     }
 }

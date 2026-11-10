@@ -1,22 +1,22 @@
-﻿using Businfo.Helper;
+﻿#nullable enable
+using Businfo.Helper;
 using Businfo.Manage;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
 
 namespace Businfo.AddEdit
 {
     public partial class AddEditCity : Window
     {
-        private bool isNew;
+        private readonly bool isNew;
         private string existingId;
         private string currentGuid;
 
-        public ObservableCollection<BusData> matched { get; private set; } = new ObservableCollection<BusData>();
-        private List<BusData> allBusesCache = new List<BusData>();
+        public ObservableCollection<BusData> Matched { get; } = new ObservableCollection<BusData>();
 
+        // 1. New City Constructor
         public AddEditCity()
         {
             InitializeComponent();
@@ -24,35 +24,77 @@ namespace Businfo.AddEdit
             existingId = "0";
             currentGuid = Guid.NewGuid().ToString();
 
-            matched_grid.ItemsSource = matched;
-            LoadAllBusesCacheAsync();
+            matched_grid.ItemsSource = Matched;
+
+            txtCity.TextChanged += (s, e) => FilterMatchedBuses(txtCity.Text?.Trim() ?? string.Empty);
+
+            LoadBusesFromCache();
 
 #if DEBUG
             FillDummyData();
 #endif
         }
 
+        // 2. Direct Model Overload (Fast & 0 Network Call) ⚡
+        public AddEditCity(CityModel city)
+        {
+            InitializeComponent();
+            isNew = false;
+            existingId = city.DocId ?? "0";
+            currentGuid = !string.IsNullOrWhiteSpace(city.GUID) ? city.GUID : Guid.NewGuid().ToString();
+
+            matched_grid.ItemsSource = Matched;
+
+            txtCity.TextChanged += (s, e) => FilterMatchedBuses(txtCity.Text?.Trim() ?? string.Empty);
+
+            PopulateCityFields(city);
+            LoadBusesFromCache();
+        }
+
+        // 3. Fallback ID Overload (Sirf jab model available na ho)
         public AddEditCity(string id)
         {
             InitializeComponent();
             isNew = false;
             existingId = id;
-            matched_grid.ItemsSource = matched;
+            currentGuid = Guid.NewGuid().ToString();
 
-            LoadAllBusesCacheAsync();
+            matched_grid.ItemsSource = Matched;
+
+            txtCity.TextChanged += (s, e) => FilterMatchedBuses(txtCity.Text?.Trim() ?? string.Empty);
+
+            LoadBusesFromCache();
             LoadCityByIdAsync(id);
         }
 
 #if DEBUG
         private void FillDummyData()
         {
-            var rnd = new Random().Next(10, 99);
+            int rnd = Random.Shared.Next(10, 99);
             txtState.Text = "Rajasthan";
             txtDistrict.Text = "Jaipur";
             txtCity.Text = $"Ajmer {rnd}";
             cityCode.Text = $"AJM{rnd}";
         }
 #endif
+
+        private void PopulateCityFields(CityModel city)
+        {
+            txtCity.Text = city.CityName ?? string.Empty;
+            txtDistrict.Text = city.District ?? string.Empty;
+            txtState.Text = city.State ?? string.Empty;
+            cityCode.Text = city.CityCode ?? string.Empty;
+            existingId = city.DocId ?? existingId;
+            currentGuid = !string.IsNullOrWhiteSpace(city.GUID) ? city.GUID : currentGuid;
+
+            FilterMatchedBuses(city.CityName ?? string.Empty);
+        }
+
+        private async void LoadBusesFromCache()
+        {
+            await ApiClient.GetCachedBusesAsync();
+            FilterMatchedBuses(txtCity.Text?.Trim() ?? string.Empty);
+        }
 
         private async void LoadCityByIdAsync(string id)
         {
@@ -62,85 +104,64 @@ namespace Businfo.AddEdit
                 if (city == null)
                 {
                     MessageBox.Show("City data not found!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    this.Close();
+                    Close();
                     return;
                 }
 
-                txtCity.Text = city.CityName ?? "";
-                txtDistrict.Text = city.District ?? "";
-                txtState.Text = city.State ?? "";
-                cityCode.Text = city.CityCode ?? "";
-                currentGuid = !string.IsNullOrWhiteSpace(city.GUID) ? city.GUID : Guid.NewGuid().ToString();
-
-                FilterMatchedBuses(city.CityName);
+                PopulateCityFields(city);
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Error fetching city details: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                this.Close();
+                Close();
             }
-        }
-
-        private async void LoadAllBusesCacheAsync()
-        {
-            try
-            {
-                var buses = await ApiClient.GetBusesAsync();
-                allBusesCache = buses ?? new List<BusData>();
-
-                if (!string.IsNullOrWhiteSpace(txtCity.Text))
-                {
-                    FilterMatchedBuses(txtCity.Text.Trim());
-                }
-            }
-            catch { }
         }
 
         private void FilterMatchedBuses(string cityName)
         {
             if (string.IsNullOrWhiteSpace(cityName))
             {
-                matched.Clear();
+                Matched.Clear();
                 return;
             }
 
-            matched.Clear();
-            foreach (var bus in allBusesCache)
+            Matched.Clear();
+
+            lock (ApiClient.BusCache)
             {
-                bool isMatch = false;
-
-                if (string.Equals(bus.From, cityName, StringComparison.OrdinalIgnoreCase) ||
-                    string.Equals(bus.To, cityName, StringComparison.OrdinalIgnoreCase))
+                foreach (var bus in ApiClient.BusCache)
                 {
-                    isMatch = true;
-                }
+                    if (bus == null) continue;
 
-                if (!isMatch && bus.Stops != null)
-                {
-                    foreach (var stop in bus.Stops)
+                    bool isMatch = string.Equals(bus.From, cityName, StringComparison.OrdinalIgnoreCase) ||
+                                   string.Equals(bus.To, cityName, StringComparison.OrdinalIgnoreCase);
+
+                    if (!isMatch && bus.Stops != null)
                     {
-                        if (string.Equals(stop.Station, cityName, StringComparison.OrdinalIgnoreCase))
+                        foreach (var stop in bus.Stops)
                         {
-                            isMatch = true;
-                            break;
+                            if (stop != null && string.Equals(stop.Station, cityName, StringComparison.OrdinalIgnoreCase))
+                            {
+                                isMatch = true;
+                                break;
+                            }
                         }
                     }
-                }
 
-                if (isMatch)
-                {
-                    matched.Add(bus);
+                    if (isMatch)
+                    {
+                        Matched.Add(bus);
+                    }
                 }
             }
         }
 
-        // Save
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
-            var cityName = txtCity.Text?.Trim();
-            var district = txtDistrict.Text?.Trim();
-            var state = txtState.Text?.Trim();
-            var code = cityCode.Text?.Trim();
+            string? cityName = txtCity.Text?.Trim();
+            string? district = txtDistrict.Text?.Trim();
+            string? state = txtState.Text?.Trim();
+            string? code = cityCode.Text?.Trim();
 
             if (string.IsNullOrWhiteSpace(cityName))
             {
@@ -152,9 +173,9 @@ namespace Businfo.AddEdit
             {
                 DocId = isNew ? "0" : existingId,
                 CityName = cityName,
-                District = district ?? "",
-                State = state ?? "",
-                CityCode = code ?? "",
+                District = district ?? string.Empty,
+                State = state ?? string.Empty,
+                CityCode = code ?? string.Empty,
                 GUID = currentGuid
             };
 
@@ -162,7 +183,7 @@ namespace Businfo.AddEdit
             if (success)
             {
                 MessageBox.Show(isNew ? "New city added successfully!" : "City updated successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
-                this.Close();
+                Close();
             }
             else
             {
@@ -172,16 +193,16 @@ namespace Businfo.AddEdit
 
         private void Button_Discard_Click(object sender, RoutedEventArgs e)
         {
-            this.Close();
+            Close();
         }
 
-        // Open Selected Bus from Matched Grid
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
             if (matched_grid.SelectedItem is BusData bus)
             {
-                AddEditBus addEditBus = new AddEditBus(bus);
+                var addEditBus = new AddEditBus(bus);
                 addEditBus.ShowDialog();
+                FilterMatchedBuses(txtCity.Text?.Trim() ?? string.Empty);
             }
         }
     }

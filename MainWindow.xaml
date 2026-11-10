@@ -116,16 +116,57 @@
                     <MenuItem Header="Help" Style="{StaticResource ModernMenuItem}" />
                 </Menu>
 
-                <!--  Right Auth Menu Item  -->
-                <Menu
+                <!--  Right Auth Session Display & Logout  -->
+                <StackPanel
                     Grid.Column="1"
                     VerticalAlignment="Center"
-                    Background="Transparent">
-                    <MenuItem
-                        Click="MenuItem_Click"
-                        Header="Login"
-                        Style="{StaticResource ModernMenuItem}" />
-                </Menu>
+                    Orientation="Horizontal">
+                    <Border
+                        Margin="0,0,10,0"
+                        Padding="10,4"
+                        Background="#F1F5F9"
+                        BorderBrush="#E2E8F0"
+                        BorderThickness="1"
+                        CornerRadius="6">
+                        <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
+                            <TextBlock
+                                Margin="0,0,6,0"
+                                VerticalAlignment="Center"
+                                FontFamily="Segoe MDL2 Assets"
+                                FontSize="12"
+                                Foreground="#64748B"
+                                Text="&#xE77B;" />
+                            <TextBlock
+                                VerticalAlignment="Center"
+                                FontSize="12"
+                                Foreground="#64748B"
+                                Text="Logged in as: " />
+                            <TextBlock
+                                x:Name="txtOperatorName"
+                                VerticalAlignment="Center"
+                                FontSize="12"
+                                FontWeight="Bold"
+                                Foreground="#2563EB"
+                                Text="Admin" />
+                        </StackPanel>
+                    </Border>
+                    <Button
+                        Padding="12,5"
+                        Background="#FEE2E2"
+                        BorderThickness="0"
+                        Click="BtnLogout_Click"
+                        Content="Logout"
+                        Cursor="Hand"
+                        FontSize="12"
+                        FontWeight="SemiBold"
+                        Foreground="#DC2626">
+                        <Button.Resources>
+                            <Style TargetType="Border">
+                                <Setter Property="CornerRadius" Value="6" />
+                            </Style>
+                        </Button.Resources>
+                    </Button>
+                </StackPanel>
             </Grid>
         </Border>
 
@@ -607,6 +648,7 @@
                                                             Foreground="#0F172A"
                                                             Text="+ Add New Bus" />
                                                         <TextBlock
+                                                            Margin="0,2,0,0"
                                                             FontSize="11"
                                                             Foreground="#64748B"
                                                             Text="Configure new schedule route" />
@@ -662,6 +704,7 @@
                                                             Foreground="#0F172A"
                                                             Text="+ Add New City" />
                                                         <TextBlock
+                                                            Margin="0,2,0,0"
                                                             FontSize="11"
                                                             Foreground="#64748B"
                                                             Text="Register regional transit points" />
@@ -716,6 +759,7 @@
                                                             Foreground="#0F172A"
                                                             Text="+ Add New Vendor" />
                                                         <TextBlock
+                                                            Margin="0,2,0,0"
                                                             FontSize="11"
                                                             Foreground="#64748B"
                                                             Text="Onboard partner travel agency" />
@@ -842,7 +886,7 @@
                                         FontSize="28"
                                         FontWeight="Bold"
                                         Foreground="#0F172A"
-                                        Text="424" />
+                                        Text="0" />
                                     <TextBlock
                                         Grid.Row="2"
                                         FontSize="12"
@@ -908,7 +952,7 @@
                                         FontSize="28"
                                         FontWeight="Bold"
                                         Foreground="#0F172A"
-                                        Text="424" />
+                                        Text="0" />
                                     <TextBlock
                                         Grid.Row="2"
                                         FontSize="12"
@@ -974,7 +1018,7 @@
                                         FontSize="28"
                                         FontWeight="Bold"
                                         Foreground="#0F172A"
-                                        Text="12" />
+                                        Text="0" />
                                     <TextBlock
                                         Grid.Row="2"
                                         FontSize="12"
@@ -1039,7 +1083,7 @@
                                         FontSize="28"
                                         FontWeight="Bold"
                                         Foreground="#0F172A"
-                                        Text="18" />
+                                        Text="0" />
                                     <TextBlock
                                         Grid.Row="2"
                                         FontSize="12"

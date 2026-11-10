@@ -1,8 +1,10 @@
-﻿using Businfo.Helper;
+﻿#nullable enable
+using Businfo.Helper;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -19,54 +21,63 @@ namespace Businfo.AddEdit
         public ObservableCollection<string> Depot { get; set; } = new ObservableCollection<string>();
         public ObservableCollection<StopData> Stops { get; set; } = new ObservableCollection<StopData>();
 
-        private BusData currentBus;
+        private BusData? currentBus;
         private bool isNew = true;
         private bool reUse = false;
 
-        private DataGridRow draggedRow;
+        private DataGridRow? draggedRow;
         private Point startPoint;
 
+        // 1. Add New Bus
         public AddEditBus()
         {
             InitializeComponent();
             SetupBindings();
-            LoadMetadataAsync();
+            _ = InitializeNewBusAsync();
+        }
 
+        private async Task InitializeNewBusAsync()
+        {
+            await LoadMetadataAsync();
 #if DEBUG
             FillDummyData();
 #endif
         }
 
+        // 2. Edit by ID
         public AddEditBus(string id)
         {
             InitializeComponent();
             SetupBindings();
             isNew = false;
-            LoadMetadataAsync();
-            LoadBusDataAsync(id);
+            _ = InitializeEditBusByIdAsync(id);
         }
 
+        private async Task InitializeEditBusByIdAsync(string id)
+        {
+            await LoadMetadataAsync();
+            await LoadBusDataAsync(id);
+        }
+
+        // 3. Edit / Re-use Direct Bus Instance (AddEditCity se yahi khulta hai)
         public AddEditBus(BusData bus)
         {
             InitializeComponent();
             SetupBindings();
+
+            // Existing bus ko modify kar rahe hain
+            currentBus = bus;
+            isNew = false;
             reUse = true;
-            isNew = true;
-            LoadMetadataAsync();
 
-            combo_line.Text = bus.Line;
-            combo_From.Text = bus.From;
-            combo_To.Text = bus.To;
-            route.Text = bus.Route;
-            combo_Vendor.Text = bus.Vendor;
-            combo_BusType.Text = bus.BusType;
-            combo_Depot.Text = bus.Depot;
+            _ = InitializeDirectBusAsync(bus);
+        }
 
-            Stops.Clear();
-            foreach (var stop in bus.Stops)
-            {
-                Stops.Add(stop.Clone());
-            }
+        private async Task InitializeDirectBusAsync(BusData bus)
+        {
+            // Dropdowns pehle load honge, phir text/selection bind hoga!
+            await LoadMetadataAsync();
+            ApplyBusDataToForm(bus);
         }
 
         private void SetupBindings()
@@ -77,6 +88,26 @@ namespace Businfo.AddEdit
             combo_Vendor.ItemsSource = Vendors;
             combo_BusType.ItemsSource = BusType;
             combo_Depot.ItemsSource = Depot;
+        }
+
+        private void ApplyBusDataToForm(BusData bus)
+        {
+            combo_line.Text = bus.Line ?? string.Empty;
+            combo_From.Text = bus.From ?? string.Empty;
+            combo_To.Text = bus.To ?? string.Empty;
+            route.Text = bus.Route ?? string.Empty;
+            combo_Vendor.Text = bus.Vendor ?? string.Empty;
+            combo_BusType.Text = bus.BusType ?? string.Empty;
+            combo_Depot.Text = bus.Depot ?? string.Empty;
+
+            Stops.Clear();
+            if (bus.Stops != null)
+            {
+                foreach (var stop in bus.Stops)
+                {
+                    Stops.Add(stop.Clone());
+                }
+            }
         }
 
 #if DEBUG
@@ -98,7 +129,7 @@ namespace Businfo.AddEdit
         }
 #endif
 
-        private async void LoadMetadataAsync()
+        private async Task LoadMetadataAsync()
         {
             try
             {
@@ -111,10 +142,22 @@ namespace Businfo.AddEdit
                     BusType.Clear();
                     Depot.Clear();
 
-                    foreach (var c in meta.cities) { CitiesFROM.Add(c); CitiesTO.Add(c); }
-                    foreach (var v in meta.vendors) Vendors.Add(v);
-                    foreach (var bt in meta.busTypes) BusType.Add(bt);
-                    foreach (var d in meta.depots) Depot.Add(d);
+                    if (meta.cities != null)
+                    {
+                        foreach (var c in meta.cities) { CitiesFROM.Add(c); CitiesTO.Add(c); }
+                    }
+                    if (meta.vendors != null)
+                    {
+                        foreach (var v in meta.vendors) Vendors.Add(v);
+                    }
+                    if (meta.busTypes != null)
+                    {
+                        foreach (var bt in meta.busTypes) BusType.Add(bt);
+                    }
+                    if (meta.depots != null)
+                    {
+                        foreach (var d in meta.depots) Depot.Add(d);
+                    }
                 }
             }
             catch (Exception ex)
@@ -123,7 +166,7 @@ namespace Businfo.AddEdit
             }
         }
 
-        private async void LoadBusDataAsync(string id)
+        private async Task LoadBusDataAsync(string id)
         {
             try
             {
@@ -135,19 +178,7 @@ namespace Businfo.AddEdit
                     return;
                 }
 
-                combo_line.Text = currentBus.Line;
-                combo_From.Text = currentBus.From;
-                combo_To.Text = currentBus.To;
-                route.Text = currentBus.Route;
-                combo_Vendor.Text = currentBus.Vendor;
-                combo_BusType.Text = currentBus.BusType;
-                combo_Depot.Text = currentBus.Depot;
-
-                Stops.Clear();
-                foreach (var stop in currentBus.Stops)
-                {
-                    Stops.Add(stop);
-                }
+                ApplyBusDataToForm(currentBus);
             }
             catch (Exception ex)
             {
@@ -200,7 +231,7 @@ namespace Businfo.AddEdit
                 Vendor = combo_Vendor.Text.Trim(),
                 BusType = combo_BusType.Text.Trim(),
                 Depot = combo_Depot.Text.Trim(),
-                GUID = isNew ? Guid.NewGuid().ToString() : currentBus.GUID,
+                GUID = isNew ? Guid.NewGuid().ToString() : (currentBus?.GUID ?? Guid.NewGuid().ToString()),
                 Stops = Stops.ToList()
             };
 
@@ -210,7 +241,7 @@ namespace Businfo.AddEdit
                 MessageBox.Show(isNew ? "Bus successfully add ho gayi!" : "Bus successfully update ho gayi!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
                 if (isNew && !reUse)
                 {
-                    Button_Click_1(null, null); // Clear Form
+                    Button_Click_1(sender: this, e: new RoutedEventArgs()); // Clear Form
                 }
                 else
                 {
@@ -243,7 +274,7 @@ namespace Businfo.AddEdit
         }
 
         // Reset Form
-        private void Button_Click_1(object sender, RoutedEventArgs e)
+        private void Button_Click_1(object? sender, RoutedEventArgs? e)
         {
             combo_line.Text = string.Empty;
             combo_From.Text = string.Empty;
@@ -309,7 +340,7 @@ namespace Businfo.AddEdit
                 draggedRow = row;
         }
 
-        public static T FindAncestor<T>(DependencyObject current) where T : DependencyObject
+        public static T? FindAncestor<T>(DependencyObject? current) where T : DependencyObject
         {
             while (current != null && !(current is T))
                 current = VisualTreeHelper.GetParent(current);

@@ -18,13 +18,13 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <!-- Top Header & Filter Bar -->
+        <!--  Top Header & Filter Bar  -->
         <DockPanel
             Grid.Row="0"
             Margin="0,0,0,20"
             LastChildFill="False">
 
-            <!-- Left Header -->
+            <!--  Left Header  -->
             <StackPanel
                 VerticalAlignment="Center"
                 DockPanel.Dock="Left"
@@ -44,13 +44,13 @@
                     Text="Total 0 routes active" />
             </StackPanel>
 
-            <!-- Right Controls -->
+            <!--  Right Controls  -->
             <StackPanel
                 VerticalAlignment="Center"
                 DockPanel.Dock="Right"
                 Orientation="Horizontal">
 
-                <!-- Search Box -->
+                <!--  Search Box  -->
                 <TextBox
                     x:Name="SearchTextBox"
                     Width="240"
@@ -61,30 +61,31 @@
                     Text="Search route, city, bus..."
                     TextChanged="SearchTextBox_TextChanged" />
 
-                <!-- Vendor Filter -->
+                <!--  Vendor Filter  -->
                 <ComboBox
                     x:Name="cmbVendorFilter"
                     Width="170"
                     Height="36"
                     Margin="10,0,0,0"
                     IsEditable="False"
-                    SelectionChanged="cmbVendorFilter_SelectionChanged" />
-<!-- Download Excel Template -->
-<Button
-    Margin="12,0,0,0"
-    Click="btnDownloadTemplate_Click"
-    Content="📄 Download Template"
-    Style="{StaticResource ModernPrimaryButtonStyle}" /> 
+                    SelectionChanged="cmbVendorFilter_SelectionChanged"
+                    Style="{StaticResource SearchableVirtualizedComboBox}" />
+                <!--  Download Excel Template  -->
+                <Button
+                    Margin="12,0,0,0"
+                    Click="btnDownloadTemplate_Click"
+                    Content="📄 Download Template"
+                    Style="{StaticResource ModernPrimaryButtonStyle}" />
 
 
-                <!-- Import Excel Button -->
+                <!--  Import Excel Button  -->
                 <Button
                     Margin="12,0,0,0"
                     Click="btnImportExcel_Click"
                     Content="📥 Import Excel"
                     Style="{StaticResource ModernPrimaryButtonStyle}" />
 
-                <!-- Add New Bus Button -->
+                <!--  Add New Bus Button  -->
                 <Button
                     Margin="12,0,0,0"
                     Click="btnAddBus_Click"
@@ -94,7 +95,7 @@
             </StackPanel>
         </DockPanel>
 
-        <!-- Main DataGrid Container Card -->
+        <!--  Main DataGrid Container Card  -->
         <Border
             Grid.Row="1"
             Background="#FFFFFF"
@@ -160,7 +161,7 @@
                         Binding="{Binding Depot}"
                         Header="Bus Depot" />
 
-                    <!-- Action Column -->
+                    <!--  Action Column  -->
                     <DataGridTemplateColumn Width="135" Header="Actions">
 
                         <DataGridTemplateColumn.CellTemplate>
@@ -171,7 +172,7 @@
                                     VerticalAlignment="Center"
                                     Orientation="Horizontal">
 
-                                    <!-- Edit -->
+                                    <!--  Edit  -->
                                     <Button
                                         Background="#E0E7FF"
                                         Click="Button_Click"
@@ -185,7 +186,7 @@
                                             Text="&#xE70F;" />
                                     </Button>
 
-                                    <!-- Clone -->
+                                    <!--  Clone  -->
                                     <Button
                                         Background="#DCFCE7"
                                         Click="Button_Click_1"
@@ -199,7 +200,7 @@
                                             Text="&#xE8EE;" />
                                     </Button>
 
-                                    <!-- Delete -->
+                                    <!--  Delete  -->
                                     <Button
                                         Background="#FEE2E2"
                                         Click="Button_Click_2"

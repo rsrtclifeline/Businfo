@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Media;
 
 namespace Businfo
 {
@@ -32,7 +33,7 @@ namespace Businfo
             return win;
         }
 
-        public static T GetWindow<T>() where T : Window
+        public static T? GetWindow<T>() where T : Window
         {
             return windows.OfType<T>().FirstOrDefault();
         }
@@ -66,6 +67,20 @@ namespace Businfo
         public static void Minimize(this Window window)
         {
             window.WindowState = WindowState.Minimized;
+        }
+
+        public static T? FindParent<T>(DependencyObject child) where T : DependencyObject
+        {
+            DependencyObject? parentObject = VisualTreeHelper.GetParent(child);
+
+            if (parentObject == null) return null;
+
+            if (parentObject is T parent)
+            {
+                return parent;
+            }
+
+            return FindParent<T>(parentObject);
         }
     }
 }

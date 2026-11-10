@@ -154,7 +154,7 @@ namespace Businfo.Manage
         {
             if (BusDataGrid.SelectedItem is BusData a)
             {
-                var s = new AddEditBus(a.id);
+                var s = new AddEditBus(a);
                 s.ShowDialog();
                 LoadBusData();
             }

@@ -44,25 +44,21 @@
                 VerticalAlignment="Center"
                 DockPanel.Dock="Right"
                 Orientation="Horizontal">
-                <!--  Search Box  -->
                 <TextBox
-                    x:Name="SearchTextBox"
-                    Width="200"
-                    Height="36"
+                    x:Name="txtCitySearch"
+                    Width="280"
                     Style="{StaticResource ModernSearchBox}"
-                    Text="Search city, state..." />
+                    Tag="Search city name or code..."
+                    TextChanged="TxtCitySearch_TextChanged" />
 
-                <!--  Vendor Filter ComboBox  -->
-                <ComboBox
-                    Width="160"
-                    Height="36"
+                <Button
+                    Height="38"
                     Margin="10,0,0,0"
-                    IsEditable="False"
-                    SelectedIndex="0">
-                    <ComboBoxItem Content="All Vendors" />
-                    <ComboBoxItem Content="Vendor 1" />
-                    <ComboBoxItem Content="Vendor 2" />
-                </ComboBox>
+                    Padding="14,0"
+                    Click="Button_Click_Add"
+                    Content="Add New City"
+                    Cursor="Hand"
+                    Style="{StaticResource ModernPrimaryButtonStyle}" />
             </StackPanel>
         </DockPanel>
 

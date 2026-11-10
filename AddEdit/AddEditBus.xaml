@@ -182,7 +182,7 @@
                         <ComboBox
                             x:Name="combo_line"
                             Height="36"
-                            IsEditable="False">
+                            Style="{StaticResource SearchableVirtualizedComboBox}">
                             <ComboBoxItem Content="Roadways" />
                             <ComboBoxItem Content="Private" />
                         </ComboBox>
@@ -193,7 +193,7 @@
                         <ComboBox
                             x:Name="combo_From"
                             Height="36"
-                            IsEditable="False" />
+                            Style="{StaticResource SearchableVirtualizedComboBox}" />
                     </StackPanel>
 
                     <StackPanel Width="205" Margin="0,0,16,10">
@@ -201,7 +201,7 @@
                         <ComboBox
                             x:Name="combo_To"
                             Height="36"
-                            IsEditable="False" />
+                            Style="{StaticResource SearchableVirtualizedComboBox}" />
                     </StackPanel>
 
                     <StackPanel Width="240" Margin="0,0,0,10">
@@ -220,7 +220,7 @@
                         <ComboBox
                             x:Name="combo_Vendor"
                             Height="36"
-                            IsEditable="False" />
+                            Style="{StaticResource SearchableVirtualizedComboBox}" />
                     </StackPanel>
 
                     <StackPanel Width="205" Margin="0,0,16,0">
@@ -228,7 +228,7 @@
                         <ComboBox
                             x:Name="combo_BusType"
                             Height="36"
-                            IsEditable="False" />
+                            Style="{StaticResource SearchableVirtualizedComboBox}" />
                     </StackPanel>
 
                     <StackPanel Width="205" Margin="0,0,16,0">
@@ -236,7 +236,7 @@
                         <ComboBox
                             x:Name="combo_Depot"
                             Height="36"
-                            IsEditable="False" />
+                            Style="{StaticResource SearchableVirtualizedComboBox}" />
                     </StackPanel>
                 </WrapPanel>
             </StackPanel>
