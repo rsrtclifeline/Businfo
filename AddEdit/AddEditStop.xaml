@@ -167,7 +167,7 @@
                     x:Name="cmbStation"
                     Height="36"
                     HorizontalAlignment="Stretch"
-                    IsEditable="False" />
+                    Style="{StaticResource SearchableVirtualizedComboBox}" />
             </StackPanel>
 
             <!--  Arrival & Departure Time (Side-by-Side)  -->

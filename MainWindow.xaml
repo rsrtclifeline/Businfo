@@ -892,7 +892,7 @@
                                         FontSize="12"
                                         FontWeight="Medium"
                                         Foreground="#64748B"
-                                        Text="Registered Fleet Buses" />
+                                        Text="Total Buses" />
                                 </Grid>
                             </Border>
 
@@ -958,7 +958,7 @@
                                         FontSize="12"
                                         FontWeight="Medium"
                                         Foreground="#64748B"
-                                        Text="Covered Station Cities" />
+                                        Text="Total Cities" />
                                 </Grid>
                             </Border>
 

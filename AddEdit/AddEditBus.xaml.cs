@@ -1,4 +1,5 @@
-﻿#nullable enable
+﻿
+#nullable enable
 using Businfo.Helper;
 using System;
 using System.Collections.Generic;
